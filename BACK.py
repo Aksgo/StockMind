@@ -91,13 +91,6 @@ app.config['SESSION_TYPE'] = 'filesystem' #using server side session cookies - f
 db = SQLAlchemy(app)
 Session(app)
 
-# Load API keys 
-GEMINI_API_KEY = "your_gemini_apikey"  # GeminiAPIKey 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-ALPHA_VANTAGE_API_KEY = "your_alpha_vantage_key"  # AlphaVantageAPIKey 
-client = genai.Client(api_key=GEMINI_API_KEY)
-
-
 @app.route('/alert_form')
 def alert_form():
     return render_template('alert_form.html')
@@ -402,69 +395,6 @@ def query_gemini_llm(description):
             }
         ]
  
-@app.route("/") 
-def home(): 
-    return render_template("FRONT.html") 
- 
-@app.route("/analyze_company", methods=["GET"]) 
-def analyze_company(): 
-    try:
-        company_name = request.args.get("company_name") 
-        if not company_name: 
-            return jsonify(success=False, error="No company name provided.") 
-     
-        _, summary = fetch_wikipedia_summary(company_name) 
-        if not summary: 
-            summary = f"{company_name} is a company operating in various sectors including technology and finance."
-            print(f"Using fallback description for {company_name}")
-     
-        ticker = get_ticker_from_alpha_vantage(company_name) 
-        if not ticker: 
-            ticker = company_name.split()[0].upper()
-            print(f"Using fallback ticker {ticker} for {company_name}")
-     
-        stock_prices, time_labels = fetch_stock_price(ticker) 
-        if not stock_prices or not time_labels: 
-            print(f"Using mock stock data for {ticker}")
-            stock_prices = [100 + i for i in range(30)]
-            time_labels = [f"2025-04-{i+1:02d}" for i in range(30)]
-     
-        competitors = query_gemini_llm(summary) 
-        if not competitors: 
-            competitors = [{"name": "No Sectors", "competitors": ["No competitors found."]}] 
-     
-        # Use only the first sector's competitors for top competitors
-        if competitors and competitors[0].get("competitors"):
-            relevant_competitors = competitors[0]["competitors"]
-        else:
-            relevant_competitors = []
-        print(f"Relevant competitors for {company_name}: {relevant_competitors}")
-        top_competitors = get_top_competitors(relevant_competitors)
-        print(f"Top competitors data for {company_name}:")
-        for comp in top_competitors:
-            print(f"  {comp['name']} | Ticker: {comp['ticker']} | Market Cap: {comp['market_cap']} | Last Price: {comp['stock_price']}")
-     
-        return jsonify( 
-            success=True, 
-            description=summary, 
-            ticker=ticker, 
-            stock_prices=stock_prices, 
-            time_labels=time_labels, 
-            competitors=competitors, 
-            top_competitors=top_competitors, 
-        )
-    except Exception as e:
-        print(f"Error in analyze_company: {e}")
-        return jsonify(
-            success=False, 
-            error="An error occurred while analyzing the company. Please try again with a different company name."
-        )
- 
-if __name__ == "__main__": 
-    # Get port and host from environment variables
-    port = int(os.getenv("PORT", 12001))
-    host = os.getenv("HOST", "0.0.0.0")
-    app.run(host=host, port=port, debug=True)
 def userAuthenticate():
     '''use inside route functions to block logged out user'''
     if "username" in session:
@@ -486,7 +416,6 @@ def login():
     else:
         return render_template("access-account.html", error = "Invalid Information")
         
-
 @app.route("/register", methods = ['POST'])
 def register():
     username = request.form['username']
@@ -541,6 +470,7 @@ def verify():
 def logout():
     session.pop("username", None)
     return redirect(url_for('home'))
+
 @app.route('/access-account')
 def accessAccount():
     return render_template("access-account.html")
