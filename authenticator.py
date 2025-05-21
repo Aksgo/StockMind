@@ -11,9 +11,9 @@ def generateOTP(username, usermail):
     smpt_server = 'smtp.gmail.com'
     smtp_port = 587
     #change this
-    provider = os.getenv("unialgo_provider")#<enter your environment variable storing the email address>")
+    provider = os.getenv("<enter your environment variable storing the email address>")
     #change this
-    emps = os.getenv('emps')#<enter the env variable storing the gmail app pasword>')
+    emps = os.getenv('<enter the env variable storing the gmail app pasword>')
     msg = MIMEMultipart()
     otp = random.randint(100000,999999)
     btn = f"""
