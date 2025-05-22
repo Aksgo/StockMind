@@ -6,6 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <title>Access Account</title>
 <style>
+    
     html{
         height: 100%;
         margin: 0;
@@ -14,18 +15,74 @@
     body {
         display: flex;
         justify-content: center;
-        padding: 50px;
+        padding: 70px;
         font-family: 'Poppins', sans-serif;
-        background: rgb(15, 15, 15);
+        background:#0a0f18;
         color: #c9d1d9;
-        margin: 100px auto;
+        margin: 30px auto;
     }   
+        
+    /* --- Header --- */
+    .site-header {
+    background-color: rgba(16, 22, 34, 0.85); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    }
+
+    .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    }
+
+    .logo-tagline {
+    display: flex;
+    align-items: baseline; 
+    gap: 10px;
+    margin: auto;   
+    }
+
+    .logo {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: -0.5px;
+    color : rgb(0, 123, 255);
+    }
+
+    .tagline {
+    font-size: 0.9rem;
+    color: var(--text-secondary-color);
+    font-weight: 400;
+    animation: fadeInFromLeft 1s ease-out forwards;
+    }
+
+    @keyframes fadeInFromLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+    }
+
     .container {
-        background: linear-gradient(180deg, #232a34, #14181d);
-        width: 330px;
+        background :rgb(26, 34, 51);
+        width: 350px;
         border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 0 15px rgba(58, 139, 253, 0.7);
+        margin: 30px;
+        border-radius: 10px;
+        border:1px solid #2a3649 ;
+        /* box-shadow: 0 0 15px rgba(58, 139, 253, 0.7); */
+    }
+    .login-hero{
+        display: flex;
+        flex-direction: row;
+        background: rgb(16, 22, 34);
+        margin:auto auto;
+        border:1px solid #2a3649 ;
     }
     .tabs {
         display: flex;
@@ -35,14 +92,15 @@
         text-align: center;
         padding: 15px;
         cursor: pointer;
-        background: #333;
+        background: #33333300;
         font-weight: bold;
         user-select: none;
         color: #ccc;
+        border-radius: 10px;
         transition: background 0.3s, color 0.3s;
     }
     .tab.active {
-        background: #3a8bfd;
+        border:1px solid #2573ef ;
         color: white;
     }
     .forms {
@@ -101,30 +159,44 @@
     .show-register #registerForm {
         transform: translateX(0%);
     }
+    #login-png{
+        width:500px;
+        height:500px;
+    }
+
 </style>
 </head>
 <body>
-
-<div class="container" id="container">
-  <div class="tabs">
-    <div class="tab active" id="loginTab">Login</div>
-    <div class="tab" id="registerTab">Sign Up</div>
-  </div>
-  <div class="forms">
-    <form id="loginForm" method="POST" action="/account/login">
-        <input type="email" name="email" placeholder="Email" required/>
-        <input type="password" name="password" placeholder="Password" required/>
-        <button type="submit" class="login-btn">Login</button>
-    </form>
-
-    <form id="registerForm" method="POST" action="/account/register">
-      <input type="text" name="username" placeholder="Username" required />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password (at least 8 characters)" required minlength="8"/>
-      <button type="submit" class="register-btn">Sign Up</button>
-    </form>
-  </div>
-</div>
+    <header class="site-header">
+    <div class="header-content">
+        <div class="logo-tagline">
+        <div class="logo">StockMind</div>
+        <div class="tagline">AI-Driven Equity Analysis</div>
+        </div>
+    </div>
+    </header>
+    <div class = "login-hero">
+        <img id='login-png' src ="{{url_for('static', filename = 'images/login.png')}}">
+        <div class="container" id="container">
+            <div class="tabs">
+                <div class="tab active" id="loginTab">Login</div>
+                <div class="tab" id="registerTab">Sign Up</div>
+            </div>
+            <div class="forms">
+                <form id="loginForm" method="POST" action="/account/login">
+                    <input type="email" name="email" placeholder="Email" required/>
+                    <input type="password" name="password" placeholder="Password" required/>
+                    <button type="submit" class="login-btn">Login</button>
+                </form>
+                <form id="registerForm" method="POST" action="/account/register">
+                    <input type="text" name="username" placeholder="Username" required />
+                    <input type="email" name="email" placeholder="Email" required />
+                    <input type="password" name="password" placeholder="Password (at least 8 characters)" required minlength="8"/>
+                    <button type="submit" class="register-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
 {%if otp %}
 <script>
@@ -132,7 +204,7 @@
     if(inp!=null){
         const form = document.createElement("form");
         form.method = "POST";
-        form.action = "{{url_for('verify')}}";
+        form.action = "{{url_for('auth.verify')}}";
 
         const input = document.createElement("input");
         input.type="hidden";

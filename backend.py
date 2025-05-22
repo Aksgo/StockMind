@@ -14,7 +14,6 @@ load_dotenv()
 # Load API keys from environment variables
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "abc")  # Fallback to "abc" if not found
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY", "xyz")  # Fallback to "xyz" if not found
-
 # Cache for company tickers to avoid repeated API calls
 TICKER_CACHE = {
     "apple": "AAPL",
@@ -95,8 +94,10 @@ def fetch_wikipedia_summary(company_name):
     try: 
         search_results = wikipedia.search(company_name) 
         if search_results: 
-            page_title = search_results[0] 
-            summary = wikipedia.summary(page_title, sentences=2) 
+            page_title = str(search_results[0])
+            search_query = f"{page_title} company stock"
+            summary = wikipedia.summary(search_query, sentences=4) 
+            print(summary)
             return page_title, summary 
     except Exception as e: 
         return None, f"Error fetching Wikipedia summary: {str(e)}" 
@@ -221,7 +222,6 @@ def get_top_competitors(competitors):
     
     # Use the provided competitors or fallback if empty
     competitors_to_process = set(competitors) if competitors else fallback_competitors
- 
     for competitor in competitors_to_process:  # Remove duplicate names 
         ticker = get_ticker_from_alpha_vantage(competitor) 
         if ticker and ticker not in processed_tickers: 
@@ -344,7 +344,6 @@ def analyze_company():
     company_name = request.args.get("company_name")
     if not company_name:
         return jsonify(success=False, error="No company name provided.")
-
     _, summary = fetch_wikipedia_summary(company_name)
     if not summary:
         return jsonify(success=False, error="Could not find company description.")
@@ -363,7 +362,7 @@ def analyze_company():
 
     all_competitors = [comp for sector in competitors for comp in sector["competitors"]]
     top_competitors = get_top_competitors(all_competitors)
-
+    print(top_competitors)
     return jsonify(
         success=True,
         description=summary,
